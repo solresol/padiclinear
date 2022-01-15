@@ -1,0 +1,144 @@
+\documentclass[a4paper,twocolumn, 10pt]{article}
+\title{PhD Research Proposal}
+\author{Greg Baker (gregb@ifost.org.au)}
+\setlength{\parskip}{1ex}
+\setlength{\parindent}{0mm}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage[colorlinks=true,linktoc=none]{hyperref}
+\begin{document}
+\maketitle
+\tableofcontents
+\listoffigures
+
+\section{Background}
+
+It is common to use Euclidean distances, or Manhattan distances, or
+sometimes L1, L2 or other norms in generalised linear models. But
+there are other releatively well-understood metrics which have not
+been heavily used in machine learning. In particular, p-adic metrics
+seem to have suffered from a lack of attention.
+
+
+\subsection{A very quick introduction}
+
+The p-adic distance measure of an integer $x$ can be
+defined as
+
+\begin{align*}
+ D_p(x) &= 0   \text{ if } x = 0 \\
+      &= \frac{D_p(\frac{x}{p})}{p}   \text{ if } p \text{ divides } x \\
+      &= 1 \text{ otherwise} \\
+\end{align*}
+
+This can be extended to fractions.
+
+Compared to a Euclidean metric, this provides a much richer structure.
+For example, take the problem of minimising the distance from a line to
+a set of points. With a Euclidean metric this can be solved by finding the
+zero point of the derivative. With a p-adic metric, the derivative has
+infinitely many zeroes.
+
+\section{p-adic linear regression}\label{plr}
+
+Some time around early primary school, we were all introduced to the
+ordinary-least-squares line through a set of points. The usual formulation
+is that we are trying to minimise the sum of the squares of the residuals,
+which we can calculate by a simple closed-form formula created
+by taking the derivative and finding its zero.
+
+Taking the derivative in a p-adic metric is still valid, but 
+unfortunately no is there is no unique zero of the derivative, there are
+an infinite number of them.
+
+\textbf{Do some analysis on the zeros of the derivative.}
+
+If you try to make a line through a set of points that
+minimises the sum of the p-adic distance (or the sum of squares of the p-adic
+distance), it's possible to prove that the line must pass through two
+points. This is not true with a Euclidean distance metric; and it also means
+that a p-adic linear regressor might already be fully trained and evaluated
+with only three data points.
+
+Briefly, consider a set of integer pairs $(X_i, Y_i)$ and a line $y = mx + b$
+that (supposedly) minimises $\sum_{i}{}_p|Y_i - m X_i - b|$ (the p-adic measure
+of the residuals) without
+passing through any point.
+
+Let $D_i = _p|Y_i - m X_i - b|$, let $j$ be a value for which $D_j <= D_k \forall k$.
+and define $n$ and $a$ by $a p^n = Y_j - m X_j -b$. Then the line
+$y = mx + b + a p^n$ will pass through $(X_j, Y_j)$ and be no further from any
+other point, thus contradicting the claim of minimising
+$\sum_{i}{}_p|Y_i - m X_i - b|$.
+
+Similar arguments altering $m$ can be used to show that there is a second point
+on the distance-minimising line.
+
+\textit{Can this be proven for any ultrametric?}
+
+So what is the optimal algorithm for finding a regression line
+with a p-adic metric?
+
+
+\section{The brute force approach}
+
+We can use the property that the
+optimal line must pass through two points, to come up with an
+algorithm that runs in O($N^3$) time.
+
+If that's the best that can be done, that's rather interesting. If you
+squint at it, it looks a lot like RANSAC\footnote{Is this just a
+  phenomenon of p-adic metrics being an ultra-metric, or is this
+  specific to p-adics? And if we see a collapse of different ML
+  algorithms down to a smaller subset with an ultra-metric, does that
+  mean that there's a weaker metric where our current family of
+  metrics bifurcate out to more variants?}?
+
+\section{Greg's notes so far}
+
+\subsection{Staying inside $\mathbb{Z}$}
+
+Knowing that the line must fit through two points does mean that we can do
+something that we can't do with an Euclidean metric: we can scale by a constant
+factor and make sure that all our point coordinates and coefficients are integers.
+
+If every point $(x_i, y_i)$ is a fraction\footnote{I need to look at extensions beyond
+  the p-adic fractions.} then multiplying all $x$ values by the lowest common multiple of all
+the denominators will turn the $x$ values into integers. Similarly, all $y$ values can be turned
+into integers.
+
+Since the gradient is simply $\frac{(y_2 - y_1)}{x_2 - x_1}$ and we know these are all integers,
+we can find the lowest
+common multiple of the difference of all $(i,j)$ pairs $(x_i - x_j)$.
+
+With integer coordinates and an integer gradient, the y-intercept must also be an integer.
+
+\subsection{There isn't always a unique solution}
+
+It makes sense that we can't find a unique answer by taking a derivative. There isn't a unique answer.
+
+Consider the problem of finding a line of best fit through these points:
+
+\begin{description}
+\item[A] (1,0)
+\item[B] (2,1)
+\item[C] (3,0)
+\end{description}
+
+Either line through point B is 2 away from A or C, and the line AC misses B by 1.
+
+In a 2-adic metric that means that the lines AB and BC are equally good (and better than AC); in any other
+metric all three lines are equally far from the ``other'' point.
+
+This is going to be the case whenever the data is symmetric. This doesn't happen in the Euclidean case
+because the sum-of-squares-minimising-line won't pass through any points.
+
+% Ideas:
+% For a sufficiently large prime, all the coefficients, intercepts and coordinates could be integers
+% smaller than the prime. Can we then turn this into a projective geometry problem?
+
+% If we add up the residuals from every combination of line, can we reason about whether one residual
+% must have even / odd parity? Or be congruent to something modulo some prime?
+
+\end{document}
