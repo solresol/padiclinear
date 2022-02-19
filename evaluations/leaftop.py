@@ -250,7 +250,7 @@ if existing_count == 0:
      total_vocab_size_checked,
      computation_time,
      computation_hostname     
-   ) values (%s, %s, %s, %s, %s, %s, %s, %s)""",
+   ) values (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                              [args.bible_version_id,
                              args.tokenisation_method_id,
                              algo_name,
