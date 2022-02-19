@@ -13,6 +13,7 @@
 > import CsvReader
 > import WordEncoding
 > import UnicodeWordEncoding
+> import Version
 > import VocabEnumerationWordEncoding
 >
 > data OutputOptions = ShowAnswers | ShowRuleFailures | ShowRules deriving (Eq, Show)
@@ -28,7 +29,7 @@
 > 
 > data Output = Output [OutputOptions] deriving (Eq, Show)
 >
-> data CmdlineFlag = Verbose
+> data CmdlineFlag = Verbose | OutputVersion
 >                  | AlgorithmChoiceFlag AlgorithmChoice
 >                  | OutputOptionFlag OutputOptions
 >   deriving (Eq,Show)
@@ -48,6 +49,7 @@
 > options :: [OptDescr CmdlineFlag]
 > options =
 >  [
+>    Option ['w']  ["version"]   (NoArg OutputVersion) "just show the version number and exit",
 >    Option ['v']  ["verbose"]   (NoArg Verbose) "lots of logging messages (unimplemented)",
 >    Option ['q']  ["vocabulary-based-padic"] (NoArg (AlgorithmChoiceFlag VocabularyBasedPadic)) "use a vocabulary-based encoder and a p-adic linear regression",
 >    Option ['t']  ["vocabulary-pased-siegel"] (NoArg (AlgorithmChoiceFlag VocabularyBasedSiegel)) "use a vocabulary-based encoder and a siegel based linear regression",
@@ -171,6 +173,7 @@
 > handleCmdLine :: ([CmdlineFlag], [String], [String]) -> IO ()
 > handleCmdLine (flags,filenames,errors)
 >   | errors /= [] = ioError (userError (concat errors ++ usageInfo header options))
+>   | OutputVersion `elem` flags = putStrLn Version.version
 >   | length filenames /= 1 = ioError (userError ("Incorrect number of filenames passed\n" ++ (usageInfo header options)))
 >   | otherwise = processFile (head filenames) algo showoptions
 >  where header = "Usage: singular2plural [--verbose] [ALGORITHM] [SHOWOPTIONS] csvfile"
