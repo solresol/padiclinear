@@ -15,6 +15,7 @@
 > import UnicodeWordEncoding
 > import Version
 > import VocabEnumerationWordEncoding
+> import DummyLinguistics
 >
 > data OutputOptions = ShowAnswers | ShowRuleFailures | ShowRules deriving (Eq, Show)
 >
@@ -22,6 +23,7 @@
 >                      | VocabularyBasedSiegel
 >                      | GlobalPadicLinear
 >                      | GlobalSiegel
+>                      | Y_Equals_X
 >                      | LocalPadicLinear Int
 >                      | LocalEuclideanSiegel Int
 >                      | HybridSiegel Int -- padic local cluster, Euclidean Siegel algorithm
@@ -58,6 +60,7 @@
 >    Option ['p']  ["local-padic"] (ReqArg (\x -> AlgorithmChoiceFlag (LocalPadicLinear (read x))) "COUNT") "a p-adic linear regressor based on the p-adically nearest COUNT points",
 >    Option ['s']  ["local-siegel"] (ReqArg (\x -> AlgorithmChoiceFlag (LocalEuclideanSiegel (read x))) "COUNT") "a siegel-based linear regressor based on the euclideanly nearest COUNT points",
 >    Option ['y']  ["hybrid-siegel"] (ReqArg (\x -> AlgorithmChoiceFlag (HybridSiegel (read x))) "COUNT") "a Euclidean-metric siegel-based linear regressor based on the p-adically nearest COUNT points",
+>    Option ['x']  ["y-equals-x"] (NoArg (AlgorithmChoiceFlag Y_Equals_X)) "Results from a baseline of y=x",
 >    Option ['a']  ["show-answers"] (NoArg (OutputOptionFlag ShowAnswers)) "Show the constructed plurals",
 >    Option ['r']  ["show-rule-summary"] (NoArg (OutputOptionFlag ShowRules)) "Show the rules that were used",
 >    Option ['u']  ["show-failed-rule-detail"] (NoArg (OutputOptionFlag ShowRuleFailures)) "Show the rules that were used in detail and with examples of failures"
@@ -82,6 +85,7 @@
 > predictorToUse (LocalPadicLinear m) s = padicLocalBruteForceAlgorithm (NearestByCount m) (unicodePointCodec s)
 > predictorToUse (LocalEuclideanSiegel m) s = localEuclideanSiegel (NearestByCount m) (unicodePointCodec s)
 > predictorToUse (HybridSiegel m) s = localHybridSiegel (NearestByCount m) (unicodePointCodec s)
+> predictorToUse (Y_Equals_X) s = dummyAlgorithm (unicodePointCodec s)
 >
 > studyToUse :: AlgorithmChoice -> [String] -> PointEvaluation String String RationalLine
 > studyToUse VocabularyBasedPadic s = studyUsingPadicLine (vocabEnumeration s)
@@ -91,6 +95,7 @@
 > studyToUse (LocalPadicLinear m) s = localStudyUsingPadicLine (NearestByCount m) (unicodePointCodec s)
 > studyToUse (LocalEuclideanSiegel m) s = localEuclideanStudyUsingSiegel (NearestByCount m) (unicodePointCodec s)
 > studyToUse (HybridSiegel m) s = localHybridStudyUsingSiegel (NearestByCount m) (unicodePointCodec s)
+> studyToUse (Y_Equals_X) s = studyUsingDummy (unicodePointCodec s)
 >
 
 > type SingularsAndPlurals = [(String, String)]

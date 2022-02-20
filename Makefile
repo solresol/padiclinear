@@ -1,4 +1,4 @@
-COMMON_OBJS=Scoring.lhs PadicLinguistic.lhs Metric.lhs PadicExpansion.lhs RationalGeometry.lhs PadicLinear.lhs PadicExpansion.lhs NearestNeighbours.lhs WordEncoding.lhs MachineLearning.lhs WordNeighbourhood.lhs Siegel.lhs LocalLearning.lhs EuclideanLinguistics.lhs CsvReader.lhs VocabEnumerationWordEncoding.lhs Primes.lhs Scoring.lhs UnicodeWordEncoding.lhs Version.lhs
+COMMON_OBJS=Scoring.lhs DummyLinguistics.lhs PadicLinguistic.lhs Metric.lhs PadicExpansion.lhs RationalGeometry.lhs PadicLinear.lhs PadicExpansion.lhs NearestNeighbours.lhs WordEncoding.lhs MachineLearning.lhs WordNeighbourhood.lhs Siegel.lhs LocalLearning.lhs EuclideanLinguistics.lhs CsvReader.lhs VocabEnumerationWordEncoding.lhs Primes.lhs Scoring.lhs UnicodeWordEncoding.lhs Version.lhs
 
 unicode2num: unicode2num.lhs $(COMMON_OBJS)
 	ghc -o unicode2num unicode2num.lhs
