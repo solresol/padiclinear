@@ -41,7 +41,8 @@ parser.add_argument("--show-rule-summary", action="store_true",
                     help="Instead of storing something in the database, show the rules that were used")
 parser.add_argument("--show-failed-rule-detail", action="store_true",
                     help="Show the rules that were used in detail and with examples of failures")
-
+parser.add_argument("--y-equals-x", action="store_true",
+                    help="Evaluate y=x as a regressor")
 parser.add_argument("--pgconf", default="db.conf",
                     help="Database configuration file: .ini format, with a section called database and fields dbname, user, password, host ")
 parser.add_argument("--replace", action="store_true",
@@ -101,6 +102,13 @@ if args.global_siegel:
     subprocess_args += ["--global-siegel"]
     algo_chosen = True
     algo_name = 'GlobalSiegel'
+
+if args.y_equals_x:
+    if algo_chosen:
+        sys.exit("Multiple algorithms chosen.")
+    subprocess_args += ["--y-equals-x"]
+    algo_chosen = True
+    algo_name = 'Y_Equals_X'
     
 if args.local_padic_linear:
     if algo_chosen:
