@@ -50,6 +50,7 @@ parser.add_argument("--replace", action="store_true",
 parser.add_argument("--tokenisation-method-id", default="unigram",
                     choices=['unigram', 'bigram', 'trigram', 'uni_token', 'bi_token',
                              'tri_token', 'quad_token'])
+parser.add_argument("--verbose", action="store_true", help="Show output results and the command being run")
 
 args = parser.parse_args()
 
@@ -83,6 +84,7 @@ df = pandas.read_sql(f"""SELECT singular.bible_version_id,
 intermediary_file = tempfile.NamedTemporaryFile(mode='w', dir='.', prefix='extract_from_leaftop_',
                                                 suffix='.csv', delete=False)
 df.to_csv(intermediary_file, index=False, sep='\t')
+intermediary_file.close()
 
 subprocess_args = [ args.path_to_singular2plural ]
 
@@ -137,7 +139,7 @@ if args.local_hybrid:
         sys.exit("Multiple algorithms chosen.")
     if args.local_hybrid < 3:
         sys.exit("Cannot do anything meaningful with less than 3 neighbours in a dataset")
-    subprocess_args += ["--hybrid-siegel-padic", str(args.local_hybrid)]
+    subprocess_args += ["--hybrid-siegel", str(args.local_hybrid)]
     algo_chosen = True
     algo_name = 'HybridSiegel'
     parametric_algorithm = True
@@ -161,7 +163,6 @@ if args.show_failed_rule_detail:
     subprocess_args += ["--show-failed-rule-detail"]
 
 subprocess_args += [ intermediary_file.name ]
-
 
 version_proc = subprocess.run([args.path_to_singular2plural, '--version'],
                               check=True, capture_output=True)
@@ -200,6 +201,8 @@ if not display_only:
     if existing_count > 0 and not args.replace:
         sys.exit("Record already exists in machine_learning_morphology. No point in running")
 
+if args.verbose:
+    print("Running\n"   , " ".join(subprocess_args))
 start_time = time.time()        
 proc = subprocess.run(subprocess_args, check=True, capture_output=True)
 end_time = time.time()
@@ -211,7 +214,8 @@ if display_only:
     print(text_output)
     sys.exit(0)
 
-print(text_output)
+if args.verbose:
+    print(text_output)
 rules_summary_re = re.compile('^(.*): (\d+) right, (\d+) wrong, out of a total of (\d+)$')
 m = rules_summary_re.match(text_output)
 if m is None:
