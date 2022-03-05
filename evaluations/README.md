@@ -47,3 +47,11 @@ to `./leaftop.py`:
 | `HybridSiegel`         |  --local-hybrid [COUNT]       |
 | `Y_Equals_X`           |  --y-equals-x                 |
 
+
+When there are no more absentees, run
+
+`refresh materialized view machine_learning_morphology_best_scores;`
+
+`refresh materialized view machine_learning_morphology_summary_by_version`
+
+`refresh materialized view machine_learning_morphology_summary_by_language`
