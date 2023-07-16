@@ -172,8 +172,9 @@ if args.show_failed_rule_detail:
 subprocess_args += [ intermediary_file.name ]
 
 version_proc = subprocess.run([args.path_to_singular2plural, '--version'],
-                              check=True, capture_output=True)
-version = version_proc.stdout.decode('utf-8').strip()
+                              check=True, capture_output=True, text=True)
+#version = version_proc.stdout.decode('utf-8').strip()
+version = version_proc.stdout.strip()
 
 if not display_only:
     if parametric_algorithm:
