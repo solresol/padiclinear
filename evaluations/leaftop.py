@@ -35,6 +35,7 @@ parser.add_argument("--local-siegel", type=int, metavar="COUNT",
                     help="Perform a siegel-based linear regressor based on the euclideanly nearest COUNT points")
 parser.add_argument("--local-hybrid", type=int, metavar="COUNT",
                     help="Perform a Euclidean-metric siegel-based linear regressor based on the p-adically nearest COUNT points")
+parser.add_argument("--show-texts", action="store_true", help="Instead of storing something in the database, emit the CSV file that would be passed to singular2plural")
 parser.add_argument("--show-answers", action="store_true",
                     help="Instead of storing something in the database, show the constructed plurals")
 parser.add_argument("--show-rule-summary", action="store_true",
@@ -80,6 +81,10 @@ df = pandas.read_sql(f"""SELECT singular.bible_version_id,
       and tokenisation_method_id = '{args.tokenisation_method_id}'
       and singular.noun_number = 'singular' AND plural.noun_number = 'plural'
 """, engine)
+
+if args.show_texts:
+    df.to_csv(sys.stdout, index=False, sep='\t')
+    sys.exit()
 
 intermediary_file = tempfile.NamedTemporaryFile(mode='w', dir='.', prefix='extract_from_leaftop_',
                                                 suffix='.csv', delete=False)
