@@ -5,6 +5,19 @@
 > import Data.Char
 >
 > data UnicodePointCodec = UnicodePointCodec Integer
+
+This is where I should introduce
+
+data UTF8Codec = UnicodePointCodec Integer
+data UTF16Code = UnicodePointCodec Integer
+
+and for the lolz
+
+data UTF9Codec = UnicodePointCodec Integer
+
+>
+>
+>
 > instance Codec UnicodePointCodec where
 >   word2number _ = word2unicodenum
 >   number2maybeword _ r
@@ -16,6 +29,9 @@
 >
 > largestCharEncodingNumber = 1114112
 > -- Actually, this is one more than the largest valid char.
+
+Interestingly, I don't think that's going to give me UTF32 as I thought.
+
 >
 > unicodePointCodec :: [String] -> UnicodePointCodec
 > unicodePointCodec = vocabInitialisedCodec
