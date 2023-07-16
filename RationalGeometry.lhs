@@ -33,7 +33,7 @@
 >      | m == 1 = "y=x" ++ (displayYIntercept b)
 >      | m == -1 = "y=-x" ++ (displayYIntercept b)
 >      | denominator m == 1 = "y=" ++ (show (numerator m)) ++ "x" ++ (displayYIntercept b)
->      | otherwise = "y=" ++ (show (numerator m)) ++ "x/" ++ (show (denominator b)) ++ (displayYIntercept b)
+>      | otherwise = "y=" ++ (show (numerator m)) ++ "x/" ++ (show (denominator m)) ++ (displayYIntercept b)
 > 
 > displayYIntercept b
 >     | b > 0 && denominator b == 1 = "+" ++ (show (numerator b))
