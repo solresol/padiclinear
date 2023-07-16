@@ -77,7 +77,7 @@ df = pandas.read_sql(f"""SELECT singular.bible_version_id,
     plural.translation_in_target_language AS plural
    FROM vocabulary_extractions singular
    JOIN vocabulary_extractions plural USING (bible_version_id, tokenisation_method_id, lemma, gender, noun_case)
-    where bible_version_id = {args.bible_version_id} 
+    where bible_version_id = {args.bible_version_id}
       and tokenisation_method_id = '{args.tokenisation_method_id}'
       and singular.noun_number = 'singular' AND plural.noun_number = 'plural'
 """, engine)
@@ -90,6 +90,8 @@ intermediary_file = tempfile.NamedTemporaryFile(mode='w', dir='.', prefix='extra
                                                 suffix='.csv', delete=False)
 df.to_csv(intermediary_file, index=False, sep='\t')
 intermediary_file.close()
+
+
 
 subprocess_args = [ args.path_to_singular2plural ]
 
@@ -116,7 +118,7 @@ if args.y_equals_x:
     subprocess_args += ["--y-equals-x"]
     algo_chosen = True
     algo_name = 'Y_Equals_X'
-    
+
 if args.local_padic_linear:
     if algo_chosen:
         sys.exit("Multiple algorithms chosen.")
@@ -160,11 +162,11 @@ if args.show_answers:
     subprocess_args += ["--show-answers"]
 
 if args.show_rule_summary:
-    display_only = True    
+    display_only = True
     subprocess_args += ["--show-rule-summary"]
 
 if args.show_failed_rule_detail:
-    display_only = True    
+    display_only = True
     subprocess_args += ["--show-failed-rule-detail"]
 
 subprocess_args += [ intermediary_file.name ]
@@ -176,7 +178,7 @@ version = version_proc.stdout.decode('utf-8').strip()
 if not display_only:
     if parametric_algorithm:
         read_cursor.execute("""
-      select count(*) from machine_learning_morphology_scoring 
+      select count(*) from machine_learning_morphology_scoring
        where bible_version_id = %s
          and tokenisation_method_id = %s
          and calculation_algorithm = %s
@@ -189,7 +191,7 @@ if not display_only:
                            version])
     else:
         read_cursor.execute("""
-      select count(*) from machine_learning_morphology_scoring 
+      select count(*) from machine_learning_morphology_scoring
        where bible_version_id = %s
          and tokenisation_method_id = %s
          and calculation_algorithm = %s
@@ -208,7 +210,7 @@ if not display_only:
 
 if args.verbose:
     print("Running\n"   , " ".join(subprocess_args))
-start_time = time.time()        
+start_time = time.time()
 proc = subprocess.run(subprocess_args, check=True, capture_output=True)
 end_time = time.time()
 computation_time = end_time - start_time
@@ -232,7 +234,7 @@ total = int(m.group(4))
 if existing_count == 0:
     if parametric_algorithm:
         write_cursor.execute("""
-   insert into machine_learning_morphology_scoring ( 
+   insert into machine_learning_morphology_scoring (
      bible_version_id,
      tokenisation_method_id,
      calculation_algorithm,
@@ -257,7 +259,7 @@ if existing_count == 0:
                              )
     else:
         write_cursor.execute("""
-   insert into machine_learning_morphology_scoring ( 
+   insert into machine_learning_morphology_scoring (
      bible_version_id,
      tokenisation_method_id,
      calculation_algorithm,
@@ -266,7 +268,7 @@ if existing_count == 0:
      answers_wrong,
      total_vocab_size_checked,
      computation_time,
-     computation_hostname     
+     computation_hostname
    ) values (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                              [args.bible_version_id,
                              args.tokenisation_method_id,
@@ -277,11 +279,11 @@ if existing_count == 0:
                               total,
                               computation_time,
                               computation_hostname]
-                             )        
+                             )
 elif args.replace:
     if parametric_algorithm:
         write_cursor.execute("""
-   update machine_learning_morphology_scoring set 
+   update machine_learning_morphology_scoring set
      answers_correct = %s,
      answers_wrong = %s,
      total_vocab_size_checked = %s,
@@ -305,7 +307,7 @@ elif args.replace:
                              )
     else:
         write_cursor.execute("""
-   update machine_learning_morphology_scoring set 
+   update machine_learning_morphology_scoring set
      answers_correct = %s,
      answers_wrong = %s,
      total_vocab_size_checked = %s,
@@ -325,8 +327,8 @@ elif args.replace:
                              args.tokenisation_method_id,
                              algo_name,
                              version]
-                             )            
-                             
+                             )
+
 conn.commit()
-    
+
 os.remove(intermediary_file.name)
