@@ -1,2 +1,7 @@
 db.conf
 *~*.csv
+.ipynb_checkpoints
+experiment-diffs-not-normal.png
+heatmap-of-proportion-correct.png
+p-adic-experimental-results.png
+reverse-padic-experiment.png
